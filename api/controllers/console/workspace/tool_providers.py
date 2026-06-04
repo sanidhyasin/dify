@@ -211,8 +211,7 @@ class MCPProviderBasePayload(BaseModel):
     headers: dict[str, Any] | None = Field(default_factory=dict)
     authentication: dict[str, Any] | None = Field(default_factory=dict)
     # None means "leave unchanged" on PATCH; the create path coalesces to
-    # safe defaults at the call site below.
-    forward_user_identity: bool | None = None
+    # the safe default (off) at the call site below.
     identity_mode: IdentityMode | None = None
 
 
@@ -1004,7 +1003,6 @@ class ToolProviderMCPApi(Resource):
                 headers=payload.headers or {},
                 configuration=configuration,
                 authentication=authentication,
-                forward_user_identity=payload.forward_user_identity or False,
                 identity_mode=payload.identity_mode or IdentityMode.OFF,
             )
 
@@ -1073,7 +1071,6 @@ class ToolProviderMCPApi(Resource):
                 configuration=configuration,
                 authentication=authentication,
                 validation_result=validation_result,
-                forward_user_identity=payload.forward_user_identity,
                 identity_mode=payload.identity_mode,
             )
 

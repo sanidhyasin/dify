@@ -136,7 +136,6 @@ class MCPToolManageService:
         configuration: MCPConfiguration,
         authentication: MCPAuthentication | None = None,
         headers: dict[str, str] | None = None,
-        forward_user_identity: bool = False,
         identity_mode: IdentityMode = IdentityMode.OFF,
     ) -> ToolProviderApiEntity:
         """Create a new MCP provider."""
@@ -173,7 +172,6 @@ class MCPToolManageService:
             sse_read_timeout=configuration.sse_read_timeout,
             encrypted_headers=encrypted_headers,
             encrypted_credentials=encrypted_credentials,
-            forward_user_identity=forward_user_identity,
             identity_mode=identity_mode,
         )
 
@@ -198,7 +196,6 @@ class MCPToolManageService:
         configuration: MCPConfiguration,
         authentication: MCPAuthentication | None = None,
         validation_result: ServerUrlValidationResult | None = None,
-        forward_user_identity: bool | None = None,
         identity_mode: IdentityMode | None = None,
     ) -> None:
         """
@@ -261,11 +258,9 @@ class MCPToolManageService:
             if authentication and authentication.client_id:
                 mcp_provider.encrypted_credentials = self._process_credentials(authentication, mcp_provider, tenant_id)
 
-            # Update user-identity forwarding settings if provided.
-            # None means "leave unchanged" so this stays backwards-compatible
-            # with existing callers that don't know about M2.
-            if forward_user_identity is not None:
-                mcp_provider.forward_user_identity = forward_user_identity
+            # Update user-identity forwarding mode if provided. None means
+            # "leave unchanged" so PATCH callers that don't touch this field
+            # keep working.
             if identity_mode is not None:
                 mcp_provider.identity_mode = identity_mode
 

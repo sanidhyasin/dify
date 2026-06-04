@@ -45,7 +45,6 @@ class MCPTool(Tool):
         headers: dict[str, str] | None = None,
         timeout: float | None = None,
         sse_read_timeout: float | None = None,
-        forward_user_identity: bool = False,
         identity_mode: IdentityMode = IdentityMode.OFF,
     ):
         super().__init__(entity, runtime)
@@ -56,7 +55,6 @@ class MCPTool(Tool):
         self.headers = headers or {}
         self.timeout = timeout
         self.sse_read_timeout = sse_read_timeout
-        self.forward_user_identity = forward_user_identity
         self.identity_mode: IdentityMode = identity_mode
         self._latest_usage = LLMUsage.empty_usage()
 
@@ -245,7 +243,6 @@ class MCPTool(Tool):
             headers=self.headers,
             timeout=self.timeout,
             sse_read_timeout=self.sse_read_timeout,
-            forward_user_identity=self.forward_user_identity,
             identity_mode=self.identity_mode,
         )
 
@@ -261,15 +258,11 @@ class MCPTool(Tool):
 
     @property
     def _forwarding_requested(self) -> bool:
-        """True only when forwarding is enabled, supported, AND the deployment
-        actually has the enterprise side that can mint identity tokens.
-        Non-enterprise installs treat the DB flags as no-ops — a stale row
+        """True only when the configured identity_mode wants forwarding AND
+        the deployment actually has the enterprise side that can mint tokens.
+        Non-enterprise installs treat the DB value as a no-op — a stale row
         won't trigger a 5xx against a missing inner-API endpoint."""
-        return (
-            self.forward_user_identity
-            and self.identity_mode == IdentityMode.IDP_TOKEN
-            and dify_config.ENTERPRISE_ENABLED
-        )
+        return self.identity_mode != IdentityMode.OFF and dify_config.ENTERPRISE_ENABLED
 
     def invoke_remote_mcp_tool(
         self,

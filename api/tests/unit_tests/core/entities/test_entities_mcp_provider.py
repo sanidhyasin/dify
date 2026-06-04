@@ -53,7 +53,6 @@ def test_from_db_model_maps_fields() -> None:
         icon=None,
         created_at=now,
         updated_at=now,
-        forward_user_identity=False,
         identity_mode="off",
     )
 

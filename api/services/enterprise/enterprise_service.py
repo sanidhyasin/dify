@@ -140,9 +140,9 @@ class EnterpriseService:
         """Mint a short-lived SSO id_token (or OAuth2 access_token) representing
         the calling Dify user, audience-scoped to the given MCP server identifier.
 
-        Used by MCPTool.invoke_remote_mcp_tool to stamp `Authorization: Bearer
-        <token>` on outbound MCP requests when the provider has
-        forward_user_identity=True and identity_mode="idp_token".
+        Used by MCPTool.invoke_remote_mcp_tool to stamp the
+        X-Dify-SSO-Access-Token header on outbound MCP requests when the
+        provider's identity_mode is set to "idp_token".
 
         Returns:
             (token, expires_at_unix_seconds)

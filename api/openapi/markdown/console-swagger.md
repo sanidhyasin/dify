@@ -14165,7 +14165,6 @@ Enum class for large language model mode.
 | ---- | ---- | ----------- | -------- |
 | authentication | object |  | No |
 | configuration | object |  | No |
-| forward_user_identity | boolean |  | No |
 | headers | object |  | No |
 | icon | string |  | Yes |
 | icon_background | string |  | No |
@@ -14187,7 +14186,6 @@ Enum class for large language model mode.
 | ---- | ---- | ----------- | -------- |
 | authentication | object |  | No |
 | configuration | object |  | No |
-| forward_user_identity | boolean |  | No |
 | headers | object |  | No |
 | icon | string |  | Yes |
 | icon_background | string |  | No |

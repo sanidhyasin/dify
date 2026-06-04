@@ -153,8 +153,8 @@ def test_mcp_tool_handle_none_parameter_filters_empty_values():
 # ----- M2/M3 user-identity forwarding ---------------------------------------
 
 
-def _build_forwarding_tool(*, forward: bool = True, mode: str = "idp_token") -> MCPTool:
-    """Helper that builds an MCPTool with forwarding flags set."""
+def _build_forwarding_tool(*, mode: str = "idp_token") -> MCPTool:
+    """Helper that builds an MCPTool with the identity_mode set."""
     entity = ToolEntity(
         identity=ToolIdentity(
             author="author",
@@ -172,7 +172,6 @@ def _build_forwarding_tool(*, forward: bool = True, mode: str = "idp_token") -> 
         icon="icon.svg",
         server_url="https://mcp.example.com/mcp/",
         provider_id="provider-id",
-        forward_user_identity=forward,
         identity_mode=mode,
     )
 
@@ -232,8 +231,8 @@ def test_invoke_remote_mcp_tool_fails_closed_when_user_id_missing():
 
 
 def test_invoke_skips_forwarding_when_enterprise_disabled():
-    """Non-enterprise deployments treat the DB toggle as a no-op: a stale
-    `forward_user_identity=True` row must NOT raise (fail-closed) AND must
+    """Non-enterprise deployments treat the DB selector as a no-op: a stale
+    `identity_mode="idp_token"` row must NOT raise (fail-closed) AND must
     NOT call the enterprise inner API. The runtime falls through to the
     legacy provider-identity path."""
     tool = _build_forwarding_tool()

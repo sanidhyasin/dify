@@ -28,7 +28,6 @@ class MCPToolProviderController(ToolProviderController):
         headers: dict[str, str] | None = None,
         timeout: float | None = None,
         sse_read_timeout: float | None = None,
-        forward_user_identity: bool = False,
         identity_mode: IdentityMode = IdentityMode.OFF,
     ):
         super().__init__(entity)
@@ -39,7 +38,6 @@ class MCPToolProviderController(ToolProviderController):
         self.headers = headers or {}
         self.timeout = timeout
         self.sse_read_timeout = sse_read_timeout
-        self.forward_user_identity = forward_user_identity
         self.identity_mode: IdentityMode = identity_mode
 
     @property
@@ -109,7 +107,6 @@ class MCPToolProviderController(ToolProviderController):
             headers=entity.headers,
             timeout=entity.timeout,
             sse_read_timeout=entity.sse_read_timeout,
-            forward_user_identity=entity.forward_user_identity,
             identity_mode=entity.identity_mode,
         )
 
@@ -140,7 +137,6 @@ class MCPToolProviderController(ToolProviderController):
             headers=self.headers,
             timeout=self.timeout,
             sse_read_timeout=self.sse_read_timeout,
-            forward_user_identity=self.forward_user_identity,
             identity_mode=self.identity_mode,
         )
 
@@ -159,7 +155,6 @@ class MCPToolProviderController(ToolProviderController):
                 headers=self.headers,
                 timeout=self.timeout,
                 sse_read_timeout=self.sse_read_timeout,
-                forward_user_identity=self.forward_user_identity,
                 identity_mode=self.identity_mode,
             )
             for tool_entity in self.entity.tools

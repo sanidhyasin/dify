@@ -83,7 +83,6 @@ class MCPProviderEntity(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    forward_user_identity: bool = False
     identity_mode: IdentityMode = IdentityMode.OFF
 
     @classmethod
@@ -106,7 +105,6 @@ class MCPProviderEntity(BaseModel):
             icon=db_provider.icon or "",
             created_at=db_provider.created_at,
             updated_at=db_provider.updated_at,
-            forward_user_identity=db_provider.forward_user_identity,
             identity_mode=IdentityMode(db_provider.identity_mode),
         )
 
@@ -182,7 +180,6 @@ class MCPProviderEntity(BaseModel):
             "updated_at": int(self.updated_at.timestamp()),
             "label": I18nObject(en_US=self.name, zh_Hans=self.name).to_dict(),
             "description": I18nObject(en_US="", zh_Hans="").to_dict(),
-            "forward_user_identity": self.forward_user_identity,
             "identity_mode": self.identity_mode,
         }
 
