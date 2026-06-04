@@ -214,20 +214,6 @@ class MCPProviderBasePayload(BaseModel):
     # the safe default (off) at the call site below.
     identity_mode: IdentityMode | None = None
 
-    @model_validator(mode="after")
-    def _gate_identity_mode_on_enterprise(self) -> "MCPProviderBasePayload":
-        """Non-enterprise deployments must not be able to set a
-        non-OFF identity_mode — the inner-API endpoint that mints the
-        forwarded token only exists on the enterprise side, and silently
-        accepting the value would leave a misleading row in the DB."""
-        if (
-            self.identity_mode is not None
-            and self.identity_mode != IdentityMode.OFF
-            and not dify_config.ENTERPRISE_ENABLED
-        ):
-            raise ValueError("identity_mode requires an enterprise deployment")
-        return self
-
 
 class MCPProviderCreatePayload(MCPProviderBasePayload):
     pass
