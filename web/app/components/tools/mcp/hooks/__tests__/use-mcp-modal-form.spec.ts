@@ -499,18 +499,18 @@ describe('useMCPModalForm', () => {
   })
 
   // M3 — Forward-user-identity toggle (PR #36840). The hook stores a bool,
-  // hydrates it from data.forward_user_identity, and exposes a setter.
+  // hydrates it from data.identity_mode (true iff non-"off"), and exposes a
+  // setter.
   describe('Forward-user-identity toggle', () => {
     it('defaults to false in create mode', () => {
       const { result } = renderHook(() => useMCPModalForm())
       expect(result.current.state.forwardUserIdentity).toBe(false)
     })
 
-    it('hydrates from data.forward_user_identity=true in edit mode', () => {
+    it('hydrates as true when data.identity_mode is "idp_token"', () => {
       const mockData = {
         id: 'existing-1',
         icon: { content: '🔗', background: '#6366F1' },
-        forward_user_identity: true,
         identity_mode: 'idp_token',
       } as unknown as ToolWithProvider
 
@@ -518,11 +518,11 @@ describe('useMCPModalForm', () => {
       expect(result.current.state.forwardUserIdentity).toBe(true)
     })
 
-    it('hydrates as false when data.forward_user_identity is missing or falsy', () => {
+    it('hydrates as false when data.identity_mode is missing or "off"', () => {
       const mockData = {
         id: 'existing-2',
         icon: { content: '🔗', background: '#6366F1' },
-        // forward_user_identity intentionally omitted
+        // identity_mode intentionally omitted
       } as unknown as ToolWithProvider
 
       const { result } = renderHook(() => useMCPModalForm(mockData))

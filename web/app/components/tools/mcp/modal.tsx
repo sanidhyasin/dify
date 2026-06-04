@@ -49,7 +49,6 @@ type MCPModalConfirmPayload = {
     timeout: number
     sse_read_timeout: number
   }
-  forward_user_identity?: boolean
   identity_mode?: 'off' | 'idp_token'
 }
 
@@ -129,8 +128,8 @@ const MCPModalContent: FC<MCPModalContentProps> = ({
         timeout: state.timeout || 30,
         sse_read_timeout: state.sseReadTimeout || 300,
       },
-      // Edit-mode data may carry true; clamp when SSO is no longer available.
-      forward_user_identity: state.forwardUserIdentity && isForwardIdentitySupported,
+      // Edit-mode data may carry idp_token; clamp to off when SSO is no
+      // longer available so a stale row can't keep forwarding configured.
       identity_mode: state.forwardUserIdentity && isForwardIdentitySupported ? 'idp_token' : 'off',
     })
     if (isCreate)

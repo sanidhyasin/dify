@@ -808,7 +808,6 @@ describe('MCPModal', () => {
       await waitFor(() => {
         expect(onConfirm).toHaveBeenCalledWith(
           expect.objectContaining({
-            forward_user_identity: false,
             identity_mode: 'off',
           }),
         )
@@ -833,14 +832,13 @@ describe('MCPModal', () => {
       await waitFor(() => {
         expect(onConfirm).toHaveBeenCalledWith(
           expect.objectContaining({
-            forward_user_identity: true,
             identity_mode: 'idp_token',
           }),
         )
       })
     })
 
-    it('clamps to forward_user_identity=false when SSO is unavailable, even if existing data had it on', async () => {
+    it('clamps to identity_mode="off" when SSO is unavailable, even if existing data had it on', async () => {
       mockSystemFeatures.sso_enforced_for_signin = false
       const onConfirm = vi.fn()
       const mockData = {
@@ -849,7 +847,6 @@ describe('MCPModal', () => {
         server_url: 'https://example.com/mcp',
         server_identifier: 'srv-id',
         icon: { content: '🔗', background: '#6366F1' },
-        forward_user_identity: true,
         identity_mode: 'idp_token',
       } as unknown as ToolWithProvider
 
@@ -862,7 +859,6 @@ describe('MCPModal', () => {
       await waitFor(() => {
         expect(onConfirm).toHaveBeenCalledWith(
           expect.objectContaining({
-            forward_user_identity: false,
             identity_mode: 'off',
           }),
         )
