@@ -1103,6 +1103,70 @@ List workflow apps that reference this Agent App's bound Agent (read-only)
 | 200 | Referencing workflows listed successfully | [AgentReferencingWorkflowsResponse](#agentreferencingworkflowsresponse) |
 | 404 | App not found |  |
 
+### /apps/{app_id}/agent-workspace/files
+
+#### GET
+##### Description
+
+List a directory in an Agent App conversation's sandbox workspace (read-only)
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| app_id | path | Application ID | Yes | string |
+| conversation_id | query | Agent App conversation ID | Yes | string |
+| path | query | Directory path relative to the sandbox workspace | No | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | Listing returned | [WorkspaceListResponse](#workspacelistresponse) |
+
+### /apps/{app_id}/agent-workspace/files/download
+
+#### GET
+##### Description
+
+Download a file from an Agent App conversation's sandbox workspace (read-only)
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| app_id | path | Application ID | Yes | string |
+| conversation_id | query | Agent App conversation ID | Yes | string |
+| path | query | File path relative to the sandbox workspace | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | File bytes | binary |
+| 413 | File exceeds the workspace download limit |  |
+
+### /apps/{app_id}/agent-workspace/files/preview
+
+#### GET
+##### Description
+
+Preview a text/binary file in an Agent App conversation's sandbox workspace
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| app_id | path | Application ID | Yes | string |
+| conversation_id | query | Agent App conversation ID | Yes | string |
+| path | query | File path relative to the sandbox workspace | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | Preview returned | [WorkspacePreviewResponse](#workspacepreviewresponse) |
+
 ### /apps/{app_id}/agent/logs
 
 #### GET
@@ -2622,6 +2686,76 @@ Get workflow run node execution list
 | ---- | ----------- | ------ |
 | 200 | Node executions retrieved successfully | [WorkflowRunNodeExecutionListResponse](#workflowrunnodeexecutionlistresponse) |
 | 404 | Workflow run not found |  |
+
+### /apps/{app_id}/workflow-runs/{workflow_run_id}/agent-nodes/{node_id}/workspace/files
+
+#### GET
+##### Description
+
+List a directory in a Workflow Agent node's sandbox workspace (read-only)
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| app_id | path | Application ID | Yes | string |
+| node_id | path | Workflow Agent node ID | Yes | string |
+| workflow_run_id | path | Workflow run ID | Yes | string |
+| node_execution_id | query | Optional workflow node execution ID. When omitted, the latest active session for the node is used. | No | string |
+| path | query | Directory path relative to the sandbox workspace | No | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | Listing returned | [WorkspaceListResponse](#workspacelistresponse) |
+
+### /apps/{app_id}/workflow-runs/{workflow_run_id}/agent-nodes/{node_id}/workspace/files/download
+
+#### GET
+##### Description
+
+Download a file from a Workflow Agent node's sandbox workspace (read-only)
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| app_id | path | Application ID | Yes | string |
+| node_id | path | Workflow Agent node ID | Yes | string |
+| workflow_run_id | path | Workflow run ID | Yes | string |
+| node_execution_id | query | Optional workflow node execution ID. When omitted, the latest active session for the node is used. | No | string |
+| path | query | File path relative to the sandbox workspace | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | File bytes | binary |
+| 413 | File exceeds the workspace download limit |  |
+
+### /apps/{app_id}/workflow-runs/{workflow_run_id}/agent-nodes/{node_id}/workspace/files/preview
+
+#### GET
+##### Description
+
+Preview a text/binary file in a Workflow Agent node's sandbox workspace
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| app_id | path | Application ID | Yes | string |
+| node_id | path | Workflow Agent node ID | Yes | string |
+| workflow_run_id | path | Workflow run ID | Yes | string |
+| node_execution_id | query | Optional workflow node execution ID. When omitted, the latest active session for the node is used. | No | string |
+| path | query | File path relative to the sandbox workspace | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | Preview returned | [WorkspacePreviewResponse](#workspacepreviewresponse) |
 
 ### /apps/{app_id}/workflow/comments
 
@@ -8359,6 +8493,27 @@ Get website crawl status
 | 400 | Invalid provider |
 | 404 | Crawl job not found |
 
+### /workflow-generate
+
+#### POST
+##### Description
+
+Generate a Dify workflow graph from natural language
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| payload | body |  | Yes | [WorkflowGeneratePayload](#workflowgeneratepayload) |
+
+##### Responses
+
+| Code | Description |
+| ---- | ----------- |
+| 200 | Workflow graph generated successfully |
+| 400 | Invalid request parameters |
+| 402 | Provider quota exceeded |
+
 ### /workflow/{workflow_run_id}/events
 
 #### GET
@@ -10785,14 +10940,41 @@ default (the config form sends the full desired feature state on save).
 | suggested_questions_after_answer | [AgentSuggestedQuestionsAfterAnswerFeatureConfig](#agentsuggestedquestionsafteranswerfeatureconfig) | Follow-up suggestions config, e.g. {'enabled': true} | No |
 | text_to_speech | [AgentTextToSpeechFeatureConfig](#agenttexttospeechfeatureconfig) | Text-to-speech config | No |
 
+#### AgentCliToolAuthorizationStatus
+
+Authorization state for Agent-scoped CLI tools.
+
+Missing status keeps backward compatibility with draft rows and CLI tools that
+do not need pre-authorization. Explicit denied-like states are blocked by the
+composer/publish validators and skipped by runtime request builders.
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| AgentCliToolAuthorizationStatus | string | Authorization state for Agent-scoped CLI tools.  Missing status keeps backward compatibility with draft rows and CLI tools that do not need pre-authorization. Explicit denied-like states are blocked by the composer/publish validators and skipped by runtime request builders. |  |
+
 #### AgentCliToolConfig
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
+| authorization_status | [AgentCliToolAuthorizationStatus](#agentclitoolauthorizationstatus) |  | No |
 | command | string |  | No |
+| dangerous | boolean |  | No |
+| dangerous_acknowledged | boolean |  | No |
 | description | string |  | No |
 | enabled | boolean |  | No |
+| invoke_metadata | object |  | No |
 | name | string |  | No |
+| permission | object |  | No |
+| pre_authorized | boolean |  | No |
+| risk_level | [AgentCliToolRiskLevel](#agentclitoolrisklevel) |  | No |
+
+#### AgentCliToolRiskLevel
+
+Risk marker for CLI tool bootstrap commands.
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| AgentCliToolRiskLevel | string | Risk marker for CLI tool bootstrap commands. |  |
 
 #### AgentComposerAgentResponse
 
@@ -10897,7 +11079,7 @@ Audit operation recorded for Agent Soul version/revision changes.
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| created_at | string |  | No |
+| created_at | integer |  | No |
 | created_by | string |  | No |
 | current_snapshot_id | string |  | Yes |
 | id | string |  | Yes |
@@ -10913,7 +11095,7 @@ Audit operation recorded for Agent Soul version/revision changes.
 | ---- | ---- | ----------- | -------- |
 | agent_id | string |  | No |
 | config_snapshot | [AgentSoulConfig](#agentsoulconfig) |  | Yes |
-| created_at | string |  | No |
+| created_at | integer |  | No |
 | created_by | string |  | No |
 | id | string |  | Yes |
 | revisions | [ [AgentConfigRevisionResponse](#agentconfigrevisionresponse) ] |  | No |
@@ -10932,7 +11114,7 @@ Audit operation recorded for Agent Soul version/revision changes.
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | agent_id | string |  | No |
-| created_at | string |  | No |
+| created_at | integer |  | No |
 | created_by | string |  | No |
 | id | string |  | Yes |
 | summary | string |  | No |
@@ -11004,9 +11186,9 @@ Supported icon storage formats for Agent roster entries.
 | active_config_snapshot_id | string |  | No |
 | agent_kind | [AgentKind](#agentkind) |  | Yes |
 | app_id | string |  | No |
-| archived_at | string |  | No |
+| archived_at | integer |  | No |
 | archived_by | string |  | No |
-| created_at | string |  | No |
+| created_at | integer |  | No |
 | created_by | string |  | No |
 | description | string |  | Yes |
 | existing_node_ids | [ string ] |  | No |
@@ -11020,7 +11202,7 @@ Supported icon storage formats for Agent roster entries.
 | scope | [AgentScope](#agentscope) |  | Yes |
 | source | [AgentSource](#agentsource) |  | Yes |
 | status | [AgentStatus](#agentstatus) |  | Yes |
-| updated_at | string |  | No |
+| updated_at | integer |  | No |
 | updated_by | string |  | No |
 | workflow_id | string |  | No |
 | workflow_node_id | string |  | No |
@@ -11150,9 +11332,9 @@ the current roster/workflow APIs scoped to Dify Agent.
 | active_config_snapshot_id | string |  | No |
 | agent_kind | [AgentKind](#agentkind) |  | Yes |
 | app_id | string |  | No |
-| archived_at | string |  | No |
+| archived_at | integer |  | No |
 | archived_by | string |  | No |
-| created_at | string |  | No |
+| created_at | integer |  | No |
 | created_by | string |  | No |
 | description | string |  | Yes |
 | icon | string |  | No |
@@ -11163,7 +11345,7 @@ the current roster/workflow APIs scoped to Dify Agent.
 | scope | [AgentScope](#agentscope) |  | Yes |
 | source | [AgentSource](#agentsource) |  | Yes |
 | status | [AgentStatus](#agentstatus) |  | Yes |
-| updated_at | string |  | No |
+| updated_at | integer |  | No |
 | updated_by | string |  | No |
 | workflow_id | string |  | No |
 | workflow_node_id | string |  | No |
@@ -11190,6 +11372,8 @@ Visibility and lifecycle scope of an Agent record.
 | ---- | ---- | ----------- | -------- |
 | id | string |  | No |
 | name | string |  | No |
+| permission | object |  | No |
+| permission_status | string |  | No |
 | provider | string |  | No |
 | type | string |  | No |
 
@@ -13845,6 +14029,7 @@ Request payload for bulk downloading documents as a zip archive.
 | node_id | string |  | Yes |
 | node_title | string |  | Yes |
 | rendered_content | string |  | Yes |
+| submitted_data | object |  | No |
 
 #### HumanInputFormSubmitPayload
 
@@ -16494,6 +16679,22 @@ How a workflow node is bound to an Agent.
 | ---- | ---- | ----------- | -------- |
 | features | object | Workflow feature configuration | Yes |
 
+#### WorkflowGeneratePayload
+
+Payload for the cmd+k `/create` and `/refine` workflow generator endpoint.
+
+See ``services/workflow_generator_service.py`` for behaviour. Errors are
+surfaced through the same envelope as ``/rule-generate`` so the frontend
+can reuse its existing handler.
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| current_graph | object | Existing draft graph to refine (cmd+k `/refine`); omit for create-from-scratch | No |
+| ideal_output | string | Optional sample output for grounding | No |
+| instruction | string | Natural-language workflow description | Yes |
+| mode | string | Target app mode for the generated graph<br>*Enum:* `"advanced-chat"`, `"workflow"` | Yes |
+| model_config | [ModelConfig](#modelconfig) | Model configuration | Yes |
+
 #### WorkflowListQuery
 
 | Name | Type | Description | Required |
@@ -16864,6 +17065,15 @@ Workflow tool configuration
 | remove_webapp_brand | boolean |  | No |
 | replace_webapp_logo | string |  | No |
 
+#### WorkspaceFileEntryResponse
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| mtime | integer |  | Yes |
+| name | string |  | Yes |
+| size | integer |  | Yes |
+| type | string | *Enum:* `"dir"`, `"file"`, `"symlink"` | Yes |
+
 #### WorkspaceInfoPayload
 
 | Name | Type | Description | Required |
@@ -16877,6 +17087,14 @@ Workflow tool configuration
 | limit | integer |  | No |
 | page | integer |  | No |
 
+#### WorkspaceListResponse
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| entries | [ [WorkspaceFileEntryResponse](#workspacefileentryresponse) ] |  | No |
+| path | string |  | Yes |
+| truncated | boolean |  | No |
+
 #### WorkspacePermissionResponse
 
 | Name | Type | Description | Required |
@@ -16884,6 +17102,16 @@ Workflow tool configuration
 | allow_member_invite | boolean |  | Yes |
 | allow_owner_transfer | boolean |  | Yes |
 | workspace_id | string |  | Yes |
+
+#### WorkspacePreviewResponse
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| binary | boolean |  | Yes |
+| path | string |  | Yes |
+| size | integer |  | Yes |
+| text | string |  | No |
+| truncated | boolean |  | Yes |
 
 #### _AnonymousInlineModel_b1954337d565
 
