@@ -177,9 +177,12 @@ def _build_forwarding_tool(*, forward: bool = True, mode: str = "idp_token") -> 
     )
 
 
-def test_inject_forwarded_identity_stamps_bearer_header():
-    """When _inject_forwarded_identity runs, it must put the minted token in
-    `Authorization: Bearer <token>`, overwriting whatever was there."""
+def test_inject_forwarded_identity_stamps_custom_header():
+    """The minted SSO token must be placed in X-Dify-SSO-Access-Token; the
+    workspace-scoped Authorization header and any other custom headers must
+    pass through untouched so provider credentials keep working."""
+    from core.tools.mcp_tool.tool import FORWARDED_IDENTITY_HEADER
+
     tool = _build_forwarding_tool()
     headers: dict[str, str] = {"Authorization": "Bearer static-client-token", "X-Other": "keep"}
 
@@ -189,14 +192,15 @@ def test_inject_forwarded_identity_stamps_bearer_header():
     ):
         tool._inject_forwarded_identity(headers, user_id="alice", app_id=None, audience="https://mcp.example.com/mcp/")
 
-    # Forwarded token wins; non-Authorization headers preserved.
-    assert headers["Authorization"] == "Bearer forwarded.jwt.payload"
+    assert headers[FORWARDED_IDENTITY_HEADER] == "forwarded.jwt.payload"
+    assert headers["Authorization"] == "Bearer static-client-token"
     assert headers["X-Other"] == "keep"
 
 
 def test_inject_forwarded_identity_translates_token_error_to_invoke_error():
     """EnterpriseService failures must surface as ToolInvokeError so the
     workflow halts loudly instead of proceeding without identity."""
+    from core.tools.mcp_tool.tool import FORWARDED_IDENTITY_HEADER
     from services.enterprise.base import MCPNoRefreshTokenError
 
     tool = _build_forwarding_tool()
@@ -212,6 +216,7 @@ def test_inject_forwarded_identity_translates_token_error_to_invoke_error():
             )
 
     # Headers must NOT have been mutated when token-issuance failed.
+    assert FORWARDED_IDENTITY_HEADER not in headers
     assert "Authorization" not in headers
 
 

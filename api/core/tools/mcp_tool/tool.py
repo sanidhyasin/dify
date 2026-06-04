@@ -27,6 +27,11 @@ from graphon.model_runtime.entities.llm_entities import LLMUsage, LLMUsageMetada
 
 logger = logging.getLogger(__name__)
 
+# Custom header used to carry the forwarded SSO access token. Picked to avoid
+# stomping on the workspace-scoped Authorization header (provider OAuth /
+# user-supplied custom credentials), which would silently break those flows.
+FORWARDED_IDENTITY_HEADER = "X-Dify-SSO-Access-Token"
+
 
 class MCPTool(Tool):
     def __init__(
@@ -302,7 +307,10 @@ class MCPTool(Tool):
                 if tokens and tokens.access_token:
                     headers["Authorization"] = f"{tokens.token_type.capitalize()} {tokens.access_token}"
 
-        # Stamp the forwarded identity over any existing Authorization header.
+        # Forwarded identity rides in a custom header so workspace-scoped
+        # provider credentials (Authorization / custom Headers) keep working
+        # untouched. The MCP server is expected to read X-Dify-SSO-Access-Token
+        # when identity forwarding is configured.
         forward_identity_active = False
         if self._forwarding_requested and user_id:
             self._inject_forwarded_identity(headers, user_id=user_id, app_id=app_id, audience=server_url)
@@ -333,7 +341,13 @@ class MCPTool(Tool):
         app_id: str | None,
         audience: str,
     ) -> None:
-        """Call the enterprise IssueMCPToken endpoint and stamp Authorization.
+        """Call the enterprise IssueMCPToken endpoint and stamp the issued
+        token into X-Dify-SSO-Access-Token.
+
+        A custom header is used (rather than Authorization) so it composes
+        with workspace-scoped provider credentials — the user may have OAuth
+        tokens or a custom Authorization header configured on the MCP
+        provider, and forwarding must not silently overwrite them.
 
         Errors are surfaced as ToolInvokeError so the workflow halts with a
         clear message instead of silently dropping identity and hitting the
@@ -351,4 +365,4 @@ class MCPTool(Tool):
             )
         except MCPTokenError as e:
             raise ToolInvokeError(f"Failed to obtain forwarded identity token: {e}") from e
-        headers["Authorization"] = f"Bearer {token}"
+        headers[FORWARDED_IDENTITY_HEADER] = token
