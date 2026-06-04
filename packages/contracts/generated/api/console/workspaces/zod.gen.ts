@@ -689,7 +689,6 @@ export const zIdentityMode = z.enum(['idp_token', 'off'])
 export const zMcpProviderCreatePayload = z.object({
   authentication: z.record(z.string(), z.unknown()).nullish(),
   configuration: z.record(z.string(), z.unknown()).nullish(),
-  forward_user_identity: z.boolean().nullish(),
   headers: z.record(z.string(), z.unknown()).nullish(),
   icon: z.string(),
   icon_background: z.string().optional().default(''),
@@ -706,7 +705,6 @@ export const zMcpProviderCreatePayload = z.object({
 export const zMcpProviderUpdatePayload = z.object({
   authentication: z.record(z.string(), z.unknown()).nullish(),
   configuration: z.record(z.string(), z.unknown()).nullish(),
-  forward_user_identity: z.boolean().nullish(),
   headers: z.record(z.string(), z.unknown()).nullish(),
   icon: z.string(),
   icon_background: z.string().optional().default(''),

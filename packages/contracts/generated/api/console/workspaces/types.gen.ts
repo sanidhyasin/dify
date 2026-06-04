@@ -391,7 +391,6 @@ export type McpProviderCreatePayload = {
   configuration?: {
     [key: string]: unknown
   } | null
-  forward_user_identity?: boolean | null
   headers?: {
     [key: string]: unknown
   } | null
@@ -411,7 +410,6 @@ export type McpProviderUpdatePayload = {
   configuration?: {
     [key: string]: unknown
   } | null
-  forward_user_identity?: boolean | null
   headers?: {
     [key: string]: unknown
   } | null
