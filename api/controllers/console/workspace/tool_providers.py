@@ -1083,9 +1083,7 @@ class ToolProviderMCPApi(Resource):
             # the result on ENTERPRISE_ENABLED — both are API-layer concerns, so
             # the service receives a concrete IdentityMode.
             existing = service.get_provider(provider_id=payload.provider_id, tenant_id=current_tenant_id)
-            identity_mode = _resolve_identity_mode(
-                payload.identity_mode, current=IdentityMode(existing.identity_mode)
-            )
+            identity_mode = _resolve_identity_mode(payload.identity_mode, current=IdentityMode(existing.identity_mode))
             service.update_provider(
                 tenant_id=current_tenant_id,
                 provider_id=payload.provider_id,
