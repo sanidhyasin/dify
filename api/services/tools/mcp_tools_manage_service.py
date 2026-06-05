@@ -196,7 +196,7 @@ class MCPToolManageService:
         configuration: MCPConfiguration,
         authentication: MCPAuthentication | None = None,
         validation_result: ServerUrlValidationResult | None = None,
-        identity_mode: IdentityMode | None = None,
+        identity_mode: IdentityMode = IdentityMode.OFF,
     ) -> None:
         """
         Update an MCP provider.
@@ -258,11 +258,10 @@ class MCPToolManageService:
             if authentication and authentication.client_id:
                 mcp_provider.encrypted_credentials = self._process_credentials(authentication, mcp_provider, tenant_id)
 
-            # Update user-identity forwarding mode if provided. None means
-            # "leave unchanged" so PATCH callers that don't touch this field
-            # keep working.
-            if identity_mode is not None:
-                mcp_provider.identity_mode = identity_mode
+            # Update user-identity forwarding mode. The controller has already
+            # resolved "leave unchanged" and applied the ENTERPRISE_ENABLED gate,
+            # so this is always a concrete, vetted value.
+            mcp_provider.identity_mode = identity_mode
 
             # Flush changes to database
             self._session.flush()
